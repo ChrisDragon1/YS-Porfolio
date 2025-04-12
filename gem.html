@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Video Library (Dynamic)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0; /* Removed default body padding */
+            background-color: #f0f0f0;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            /* Add padding here if needed, or rely on element margins */
+        }
+        .nav-menu {
+            background-color: #3498db;
+            padding: 15px 0;
+            margin-bottom: 20px;
+            position: sticky; /* Make nav sticky */
+            top: 0;         /* Stick to the top */
+            z-index: 1000;  /* Ensure it's above other content */
+            text-align: center; /* Center nav items */
+        }
+        .nav-item {
+            display: inline-block;
+            margin: 0 10px; /* Reduced margin slightly */
+        }
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 5px 10px; /* Add some padding for better click area */
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+        .nav-link:hover {
+            text-decoration: none; /* Keep underline off on hover */
+            background-color: #2980b9; /* Darker blue on hover */
+        }
+        .project-section {
+            background-color: white;
+            margin: 0 20px 30px 20px; /* Add side margin to section */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            scroll-margin-top: 80px; /* Offset for sticky nav */
+        }
+        .project-title {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-top: 0; /* Remove default top margin */
+        }
+        .video-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .video-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .video-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .video-link {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: bold; /* Added bold */
+            display: block; /* Ensure it takes full width */
+            margin-bottom: 5px; /* Space between link and date */
+        }
+        .video-link:hover {
+            text-decoration: underline;
+        }
+        .video-date {
+            color: #7f8c8d;
+            font-size: 0.9em; /* Slightly larger date */
+            display: block; /* Ensure it's on its own line */
+        }
+        /* Simple slugify function for IDs */
+        :target {
+             animation: highlight 1.5s ease-out;
+        }
+        @keyframes highlight {
+            from { background-color: yellow; }
+            to { background-color: white; }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container" id="app-container">
+        <!-- Navigation Menu will be generated here -->
+        <!-- Project Sections will be generated here -->
+    </div>
+
+    <script>
+        // --- Data Configuration ---
+        const rawData = `Titan X Volt Genie Turbo Bonfire Ascendant Shaolin Phoenix Goat X Vyper Tinc Awesome X shogun Eden Inferno Flux Lotus Alien X https://x.com/stevedefi7/status/1889978808838828365 https://x.com/DEFIVOLT/status/1865378239079649491 http://x.com/GenieofBitcoin/status/1890736245250064660 https://x.com/DEFIVOLT/status/1865128507677765818/video/1 https://x.com/bonfirex28/status/1885069997258461387 https://x.com/TraderLi/status/1881740630025474449 https://x.com/ShaolinXDeFi/status/1877867235378639304 https://x.com/TeamPhoenixWin/status/1878096271761641753 https://x.com/Irishcrypto4/status/1873346605354799139 https://x.com/DEFIVOLT/status/1869759697689162153/video/1 https://x.com/DEFIVOLT/status/1869509928043548971 https://x.com/AwesomeXwins/status/1864842043559723287 https://x.com/OGXenian/status/1859342345394679902 https://x.com/ShaolinXDeFi/status/1857436863784435885 https://x.com/InfernoBullWin/status/1855551435343069270 https://x.com/BADSPORTSLABS/status/1853163226110021985 https://x.com/ShaolinXDeFi/status/1848117529308225576 https://x.com/BADSPORTSLABS/status/1846520759633559589 https://x.com/stevedefi7/status/1889770327376306610 https://x.com/DEFIVOLT/status/1853399116228768245 http://x.com/GenieofBitcoin/status/1885505019304124734 https://x.com/DEFIVOLT/status/1863393551939199303/video/1 https://x.com/TraderLi/status/1879831091701272824 https://x.com/ShaolinXDeFi/status/1877498519625322802 https://x.com/TeamPhoenixWin/status/1873396664658194456 https://x.com/DEFIVOLT/status/1869090140397945097/video/1 https://x.com/DEFIVOLT/status/1865890554078171602 https://x.com/AwesomeXwins/status/1862267075307172298 https://x.com/ShaolinXDeFi/status/1857075293296505026 https://x.com/InfernoBullWin/status/1854261152399958172 https://x.com/BADSPORTSLABS/status/1853090359053533220 https://x.com/ShaolinXDeFi/status/1847807818616672748 https://x.com/stevedefi7/status/1888191305182060674 https://x.com/DEFIVOLT/status/1852687396749390260 http://x.com/DEFIVOLT/status/1877149638182023492/video/1 htp://x.com/DEFIVOLT/status/1863207277890601438/video/1 https://x.com/WarriorSoul8888/status/1876627463972741404 https://x.com/TeamPhoenixWin/status/1867968160827404796 https://x.com/DEFIVOLT/status/1870133827726872688/video/1 https://x.com/AwesomeXwins/status/1859703586663563350 https://x.com/BADSPORTSLABS/status/1848809794725167207 https://x.com/BADSPORTSLABS/status/1847610579785064782 https://x.com/ShaolinXDeFi/status/1847063085925675089 https://x.com/stevedefi7/status/1886165345020543364 https://x.com/DEFIVOLT/status/1852565486971617651 http://x.com/DEFIVOLT/status/1877149638182023492 htp://x.com/DEFIVOLT/status/1863178170590994871/video/1 https://x.com/TeamPhoenixWin/status/1867189629570486312 https://x.com/DEFIVOLT/status/1870470517645595127 https://x.com/CryptoAwesomely/status/1857419025019465895 https://x.com/ShaolinXDeFi/status/1845944249616936997 https://x.com/stevedefi7/status/1885467132932104363 https://x.com/DEFIVOLT/status/18523783676658729h6t7tps://x.com/DEFIVOLT/status/1863109732304576918/video/1 https://x.com/TeamPhoenixWin/status/1865792356856766902 https://x.com/DEFIVOLT/status/1869179511725867299 https://x.com/AwesomeXwins/status/1856376901067055337 https://x.com/DEFIVOLT/status/1868939350068936767/video/1 https://x.com/DEFIVOLT/status/18522458857212191h6t3tps://x.com/DEFIVOLT/status/1863033706010603618/video/1 https://x.com/TeamPhoenixWin/status/1864006412067574096 https://x.com/DEFIVOLT/status/1868813133550436771/video/1 https://x.com/AwesomeXwins/status/1854613794485682570 https://x.com/DEFIVOLT/status/1868824186082541913/video/1 https://x.com/YoungStunnersss/status/1852235153260609873 https://x.com/DEFIVOLT/status/1862844964893274459/video/1 https://x.com/BADSPORTSLABS/status/1863199228421349382 https://x.com/DEFIVOLT/status/1869393318658093424 https://x.com/CryptoAwesomely/status/1852001203879575688 https://x.com/DEFIVOLT/status/1866093137896288697/video/1 https://x.com/DEFIVOLT/status/18515455783767656h4t4tps://x.com/DEFIVOLT/status/1865128507677765818/video/11 https://x.com/TeamPhoenixWin/status/1861870732533174487 https://x.com/DEFIVOLT/status/1868939350068936767 https://x.com/CryptoAwesomely/status/1851665703331598668 https://x.com/DEFIVOLT/status/1865890554078171602/video/1 https://x.com/DEFIVOLT/status/18515538495945359h7t5tps://x.com/DEFIVOLT/status/1863393551939199303/video/11 https://x.com/TeamPhoenixWin/status/1861090584191983879 https://x.com/DEFIVOLT/status/1868813133550436771 https://x.com/AwesomeXwins/status/1851264070948962634 https://x.com/DEFIVOLT/status/1865378239079649491/video/1 https://x.com/DEFIVOLT/status/18512737661243108h3t6tps://x.com/DEFIVOLT/status/1863207277890601438/video/11 https://x.com/DEFIVOLT/status/1866140933617508723 https://x.com/HQMORPH/status/1873415806358548644 https://x.com/YoungStunnersss/status/1851232501941109210 https://x.com/DEFIVOLT/status/1863178170590994871/video/11 https://x.com/DEFIVOLT/status/1862276723829539197 https://x.com/DEFIVOLT/status/1866093137896288697/video/11 https://x.com/DEFIVOLT/status/18508366914575855h7t2tps://x.com/DEFIVOLT/status/1863033706010603618/video/11 https://x.com/DEFIVOLT/status/1861414044961325469 https://x.com/stevedefi7/status/1865149383269839168 https://x.com/DEFIVOLT/status/18509509129210145h0t0tps://x.com/DEFIVOLT/status/1862573378621595917 https://x.com/DEFIVOLT/status/1861103389481779627 https://x.com/DEFIVOLT/status/1850989795675115927 https://x.com/DEFIVOLT/status/18493731283187509h7t5tps://x.com/DEFIVOLT/status/1862192750919102973 https://x.com/DEFIVOLT/status/1860987425092178274 https://x.com/DEFIVOLT/status/1849937867969073605 https://x.com/DEFIVOLT/status/1848650254016446748 https://x.com/DEFIVOLT/status/1858702568777548275 https://x.com/DEFIVOLT/status/1849957575028044287 https://x.com/DEFIVOLT/status/1848301692921463101 https://x.com/DEFIVOLT/status/1858447132304331000 https://x.com/DEFIVOLT/status/1849821229504422162 https://x.com/DEFIVOLT/status/1848040441750372464 https://x.com/DEFIVOLT/status/1858181200059269543 https://x.com/DEFIVOLT/status/1848460017189507245 https://x.com/DEFIVOLT/status/1847980852476604604 https://x.com/DEFIVOLT/status/1857765776972824864 https://x.com/BADSPORTSLABS/status/1849393982603710694 https://x.com/DEFIVOLT/status/1847363848723960002 https://x.com/DEFIVOLT/status/1857569622603468979 https://x.com/BADSPORTSLABS/status/1848103583515824397 https://x.com/DEFIVOLT/status/1847103855361757539 https://x.com/DEFIVOLT/status/1857178548878094363 https://x.com/DEFIVOLT/status/1846270583602139249 https://x.com/DEFIVOLT/status/1846230744709915079 https://x.com/DEFIVOLT/status/1856343968021115330 https://x.com/DEFIVOLT/status/1846813821966413863 https://x.com/DEFIVOLT/status/1856039292541260060 https://x.com/DEFIVOLT/status/1846664074421293221 https://x.com/DEFIVOLT/status/1855771819984437451 https://x.com/DEFIVOLT/status/1846496479722033225 https://x.com/DEFIVOLT/status/1855171571532333411 https://x.com/DEFIVOLT/status/1846194177131811167 https://x.com/DEFIVOLT/status/1855084888686252085 https://x.com/DEFIVOLT/status/1846061235516682315 https://x.com/DEFIVOLT/status/1855064563747553517 https://x.com/DEFIVOLT/status/1845822158448058397 https://x.com/DEFIVOLT/status/1854854751353024930 https://x.com/DEFIVOLT/status/1845744072742273072 https://x.com/DEFIVOLT/status/1854083901196476695 https://x.com/DEFIVOLT/status/1845560752637428209 https://x.com/DEFIVOLT/status/1853776598257783290 https://x.com/DEFIVOLT/status/1845167790728056856 https://x.com/DEFIVOLT/status/1853450369076023372 https://x.com/DEFIVOLT/status/1845006487430611184 https://x.com/DEFIVOLT/status/1853261442767520119 https://x.com/DEFIVOLT/status/1844981709734818192 https://x.com/DEFIVOLT/status/1852998319263387707 https://x.com/DEFIVOLT/status/1844844495336300629 https://x.com/DEFIVOLT/status/1854348777898864759 https://x.com/DEFIVOLT/status/1844677949305299350 https://x.com/DEFIVOLT/status/1845935713931395555 https://x.com/DEFIVOLT/status/1844528000450089306 https://x.com/stevedefi7/status/1844396816521117854 https://x.com/DEFIVOLT/status/1844403728922837322 https://x.com/DEFIVOLT/status/1844154514762498188 https://x.com/DEFIVOLT/status/1844175794844860650 https://x.com/DEFIVOLT/status/1843868927061045605 https://x.com/DEFIVOLT/status/1843695828822536213 https://x.com/DEFIVOLT/status/1843610181059670280 https://x.com/DEFIVOLT/status/1843544290951299360 https://x.com/DEFIVOLT/status/1843466027377561996 https://x.com/DEFIVOLT/status/1843314563867202046 https://x.com/DEFIVOLT/status/1843196464266137848 https://x.com/DEFIVOLT/status/1843235972726882685 https://x.com/DEFIVOLT/status/1843001360243195914 https://x.com/DEFIVOLT/status/1843108643878899993 https://x.com/DEFIVOLT/status/1843091541998674206 https://x.com/DEFIVOLT/status/1842870492610314526 https://x.com/DEFIVOLT/status/1842857786729771345 https://x.com/DEFIVOLT/status/1841802047605129351 https://x.com/DEFIVOLT/status/1841741551002587149 https://x.com/DEFIVOLT/status/1841585703953592327 https://x.com/DEFIVOLT/status/1841287005403070970 https://x.com/DEFIVOLT/status/1841134035709350117`;
+
+        // Handle to project mapping (extend as needed)
+        const handleToProject = {
+            'stevedefi7': 'Titan X',
+            'DEFIVOLT': 'Volt', // Assign a primary project, handle others if needed
+            'GenieofBitcoin': 'Genie',
+            'bonfirex28': 'Bonfire',
+            'TraderLi': 'Ascendant',
+            'ShaolinXDeFi': 'Shaolin Phoenix', // Combined based on previous examples
+            'TeamPhoenixWin': 'Phoenix',
+            'Irishcrypto4': 'Goat X',
+            'AwesomeXwins': 'Awesome X',
+            'OGXenian': 'X Shogun',
+            'InfernoBullWin': 'Inferno',
+            'BADSPORTSLABS': 'Flux', // Assigning Flux, adjust if needed
+            'WarriorSoul8888': 'Turbo', // Assigning Turbo, adjust if needed
+            'CryptoAwesomely': 'Crypto Awesomely', // Example name
+            'YoungStunnersss': 'Young Stunners', // Example name
+            'HQMORPH': 'HQ MORPH' // Example name
+             // Map other handles mentioned in rawData if they represent distinct projects
+             // Note: Some handles appear very frequently (DEFIVOLT, ShaolinXDeFi).
+             // Decide if these represent multiple projects or if you want to group them.
+             // For this example, DEFIVOLT is mapped to 'Volt', Shaolin to 'Shaolin Phoenix'.
+             // BADSPORTSLABS mapped to 'Flux' based on the list.
+        };
+
+        // --- Helper Functions ---
+        function isValidUrl(url) {
+            // Improved filtering for common X.com URL issues and typos
+            return url.startsWith('https://x.com/') || url.startsWith('http://x.com/') &&
+                   !url.includes('htp:') && // Catch common typo
+                   !url.includes(' ') && // No spaces allowed
+                   url.includes('/status/') && // Must be a status URL
+                   !url.match(/status\/\d+[a-z]/i) && // No letters immediately after status ID
+                   !url.endsWith('/video/11'); // Exclude potential duplicates like /video/11
+        }
+
+        function extractStatusId(url) {
+            try {
+                const urlObj = new URL(url.replace('http://', 'https://')); // Normalize to https for URL parser
+                const pathSegments = urlObj.pathname.split('/');
+                // Status ID is usually the 3rd segment (index 3)
+                if (pathSegments.length > 3 && /^\d+$/.test(pathSegments[3])) {
+                    return BigInt(pathSegments[3]);
+                }
+            } catch (e) { /* Ignore invalid URLs */ }
+            return null;
+        }
+
+        function getHandle(url) {
+             try {
+                const urlObj = new URL(url.replace('http://', 'https://'));
+                const pathSegments = urlObj.pathname.split('/');
+                // Handle is usually the 1st segment (index 1)
+                if (pathSegments.length > 1) {
+                    return pathSegments[1];
+                }
+            } catch (e) { /* Ignore invalid URLs */ }
+            return null;
+        }
+
+        function getApproxDateFromStatusId(statusId) {
+            // Twitter Snowflake Epoch: November 4, 2010 01:42:54.657 UTC
+            // const twitterEpoch = 1288834974657n; // Original epoch used in testqwen
+            // Alternative epoch estimate often cited (slightly different):
+            const twitterEpoch = 1288834974657n; // Using the one from testqwen as it worked there
+            try {
+                 // Right shift by 22 bits to get the timestamp part
+                const timestampMs = Number(statusId >> 22n) + Number(twitterEpoch);
+                return new Date(timestampMs);
+            } catch (e) {
+                console.error("Error calculating date from status ID:", statusId, e);
+                return null;
+            }
+        }
+
+        function formatDisplayDate(date) {
+            if (!date || isNaN(date.getTime())) {
+                return "Date unavailable";
+            }
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        function slugify(text) {
+          return text.toString().toLowerCase()
+            .replace(/\s+/g, '-')           // Replace spaces with -
+            .replace(/[^\w\-]+/g, '')       // Remove all non-word chars except -
+            .replace(/\-\-+/g, '-')         // Replace multiple - with single -
+            .replace(/^-+/, '')             // Trim - from start of text
+            .replace(/-+$/, '');            // Trim - from end of text
+        }
+
+
+        // --- Main Processing Logic ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const appContainer = document.getElementById('app-container');
+            if (!appContainer) {
+                console.error("App container not found!");
+                return;
+            }
+
+            // 1. Process Raw Data into Structured Projects
+            const projects = {};
+            const urls = rawData.split(/\s+/); // Split by any whitespace
+
+            urls.forEach(url => {
+                if (isValidUrl(url)) {
+                    const handle = getHandle(url);
+                    const statusId = extractStatusId(url);
+                    const projectName = handle ? handleToProject[handle] : null;
+
+                    if (projectName && statusId) {
+                        if (!projects[projectName]) {
+                            projects[projectName] = [];
+                        }
+                        // Avoid adding duplicates based on URL
+                        if (!projects[projectName].some(video => video.url === url)) {
+                            projects[projectName].push({
+                                url: url,
+                                statusId: statusId,
+                                date: getApproxDateFromStatusId(statusId) // Calculate date once
+                            });
+                        }
+                    } else if (statusId && !projectName) {
+                         console.warn(`URL ${url} has a status ID but no mapped project for handle: ${handle}`);
+                    }
+                } else if (url.startsWith('http')) {
+                    // Log URLs that look like links but failed validation
+                    console.warn(`Skipping invalid or malformed URL: ${url}`);
+                }
+            });
+
+            // 2. Sort Project Names Alphabetically
+            const sortedProjectNames = Object.keys(projects).sort((a, b) => a.localeCompare(b));
+
+            // 3. Generate Navigation Menu
+            const navMenu = document.createElement('div');
+            navMenu.className = 'nav-menu';
+
+            sortedProjectNames.forEach(projectName => {
+                const navItem = document.createElement('div');
+                navItem.className = 'nav-item';
+
+                const navLink = document.createElement('a');
+                navLink.className = 'nav-link';
+                navLink.textContent = projectName;
+                navLink.href = `#${slugify(projectName)}`;
+
+                navItem.appendChild(navLink);
+                navMenu.appendChild(navItem);
+            });
+            appContainer.appendChild(navMenu); // Add Nav first
+
+            // 4. Generate Project Sections
+            sortedProjectNames.forEach(projectName => {
+                const videos = projects[projectName];
+                // Sort videos within the project by date (newest first)
+                videos.sort((a, b) => {
+                    // Handle cases where date might be null
+                    const dateA = a.date ? a.date.getTime() : 0;
+                    const dateB = b.date ? b.date.getTime() : 0;
+                    return dateB - dateA; // Descending order
+                });
+
+
+                const projectSection = document.createElement('div');
+                projectSection.className = 'project-section';
+                projectSection.id = slugify(projectName); // ID for anchor linking
+
+                const title = document.createElement('h2');
+                title.className = 'project-title';
+                title.textContent = projectName;
+                projectSection.appendChild(title);
+
+                const videoList = document.createElement('ul');
+                videoList.className = 'video-list';
+
+                videos.forEach(video => {
+                    const item = document.createElement('li');
+                    item.className = 'video-item';
+
+                    const link = document.createElement('a');
+                    link.className = 'video-link';
+                    link.href = video.url;
+                    link.textContent = `View Post on X`; // Clearer text
+                    link.target = '_blank'; // Open in new tab
+                    link.rel = 'noopener noreferrer'; // Security best practice
+
+                    const dateSpan = document.createElement('span');
+                    dateSpan.className = 'video-date';
+                    dateSpan.textContent = `Posted: ${formatDisplayDate(video.date)}`;
+
+                    item.appendChild(link);
+                    item.appendChild(dateSpan);
+                    videoList.appendChild(item);
+                });
+
+                projectSection.appendChild(videoList);
+                appContainer.appendChild(projectSection); // Add project section after nav
+            });
+        });
+
+    </script>
+</body>
+</html>
